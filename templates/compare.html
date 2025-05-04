@@ -1,0 +1,118 @@
+{% extends "layout.html" %}
+{% block title %}Food Comparison - HealthByte{% endblock %}
+
+{% block content %}
+<h1 class="page-header"><i class="fas fa-balance-scale me-2"></i>Food Comparison</h1>
+
+<div class="row mb-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Select Two Foods to Compare</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('compare') }}" method="post" id="compare-form" class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label for="product1" class="form-label">First Food</label>
+                        <select name="product1" id="product1" class="form-select" required>
+                            <option value="">Select a food</option>
+                            {% for name in names %}
+                            <option value="{{ name }}">{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-1 text-center">
+                        <i class="fas fa-arrow-right-arrow-left fa-lg mt-3"></i>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="product2" class="form-label">Second Food</label>
+                        <select name="product2" id="product2" class="form-select" required>
+                            <option value="">Select a food</option>
+                            {% for name in names %}
+                            <option value="{{ name }}">{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-12 d-grid mt-3">
+                        <button type="submit" class="btn" style="background-color: olive; color: white;">
+                            <i class="fas fa-balance-scale"></i> Compare Foods
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            {% for message in messages %}
+            <div class="alert alert-warning">{{ message }}</div>
+            {% endfor %}
+        </div>
+    </div>
+  {% endif %}
+{% endwith %}
+
+{% if chart_data %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Comparison Results</h5>
+                <div class="text-end">
+                    <div class="fw-bold mb-1">Calorie Category</div>
+                    <div class="d-flex align-items-center mb-1">
+                        <strong class="me-1">{{ name1 }}:</strong> {{ cat1|safe }}
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <strong class="me-1">{{ name2 }}:</strong> {{ cat2|safe }}
+                    </div>
+                </div>
+            </div>
+            <div class="card-body text-center">
+                <img src="data:image/png;base64,{{ chart_data }}" class="img-fluid" style="max-width: 100%;" alt="Comparison Chart">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Nutrient Metric Definitions -->
+<div class="row mt-4">
+    <div class="col-md-10 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Nutrition Metric Definitions</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Caloric Density:</strong> Calories per gram of food – higher values indicate more energy-dense foods.</li>
+                    <li><strong>Protein Ratio:</strong> Percentage of total calories coming from protein.</li>
+                    <li><strong>Fat Ratio:</strong> Percentage of total calories coming from fat.</li>
+                    <li><strong>Carb Ratio:</strong> Percentage of total calories coming from carbohydrates.</li>
+                    <li><strong>Sugar to Fiber Ratio:</strong> A measure of sugar content relative to fiber – lower values are generally better.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("compare-form");
+    form.addEventListener("submit", function (e) {
+        const p1 = document.getElementById("product1").value;
+        const p2 = document.getElementById("product2").value;
+        if (!p1 || !p2) {
+            alert("Please select both food items.");
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends "layout.html" %}
+
+{% block title %}Daily Tracking - HealthByte{% endblock %}
+
+{% block content %}
+<style>
+    .calendar {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+    }
+    .calendar-day {
+        width: 100%;
+        padding-top: 100%;
+        position: relative;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #000;
+        font-size: 0.6rem;
+        text-align: center;
+        overflow: hidden;
+    }
+    .calendar-day > div {
+        margin: 0;
+        line-height: 1.1;
+    }
+    .goal-met { background-color: #A4BE5C; }
+    .goal-missed { background-color: #ed969e; }
+</style>
+
+<h1 class="page-header">
+    <i class="fas fa-calendar-check me-2"></i>
+    Daily Nutrition Tracking for {{ current_user.name }}
+</h1>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Today's Food Log</h5>
+                <span class="badge rounded-pill" style="background-color: olive; color: white;">
+                    <i class="fas fa-fire me-1"></i>
+                    {{ (total_cals or 0)|round(1) }} / {{ current_user.calorie_goal or 0 }} calories
+                </span>
+            </div>
+            <div class="card-body">
+                {% if entries %}
+                <style>
+                    .custom-progress-bar {
+                      background-color: olive; 
+                      height: 25px;
+                      color: white;
+                      font-weight: bold;
+                      text-align: center;
+                      line-height: 25px;
+                      border-radius: 4px;
+                    }
+                  </style>
+                  
+                  <div class="progress" style="height: 25px;">
+                    <div class="custom-progress-bar" role="progressbar" style="width: {{ (total_cals / current_user.calorie_goal * 100)|round(0) }}%;">
+                      {{ (total_cals / current_user.calorie_goal * 100)|round(0) }}%
+                    </div>
+                  </div>
+
+                <table class="table table-hover data-table">
+                    <thead>
+                        <tr>
+                            <th>Food</th>
+                            <th>Quantity (100g)</th>
+                            <th>Calories (kcal)</th>
+                            <th>Protein (g)</th>
+                            <th>Carbs (g)</th>
+                            <th>Fat (g)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in entries %}
+                        <tr>
+                            <td>{{ entry.food.name }}</td>
+                            <td>{{ entry.quantity }}</td>
+                            <td>{{ (entry.quantity * entry.food.calories)|round(1) }}</td>
+                            <td>{{ (entry.quantity * entry.food.protein)|round(1) if entry.food.protein else 'N/A' }}</td>
+                            <td>{{ (entry.quantity * entry.food.carbohydrate)|round(1) if entry.food.carbohydrate else 'N/A' }}</td>
+                            <td>{{ (entry.quantity * entry.food.total_fat)|round(1) if entry.food.total_fat else 'N/A' }}</td>
+                            <td>
+                                <!-- Edit -->
+                                <button class="btn btn-sm" style="background-color: #A4BE5C; color: black;" onclick="editEntry({{ entry.id }}, {{ entry.quantity }})">
+                                    Edit
+                                </button>
+
+                                <!-- Delete -->
+                                <form method="POST" action="{{ url_for('delete_entry', entry_id=entry.id) }}" style="display:inline-block;" onsubmit="return confirm('Delete this entry?');">
+                                    <button type="submit" class="btn btn-sm" style="background-color: #ed969e; color: #000;">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted">No foods logged today. Use the quick add below!</p>
+                {% endif %}
+
+                <!-- Recommendations -->
+                <div class="mt-5">
+                    <h4><i class="fas fa-lightbulb me-2"></i>Recommendations to Meet Your Goal</h4>
+                    <p>Foods within your remaining goal ({{ remaining }} kcal):</p>
+
+                    {% if message %}
+                        <p class="text-muted">{{ message }}</p>
+                    {% elif recommendations %}
+                        <ul class="list-group">
+                        {% for food in recommendations %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ food.name }}
+                                <span class="badge bg-success rounded-pill">{{ food.calories }} kcal</span>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">30-Day Progress</h5>
+            </div>
+            <div class="card-body">
+                <div class="calendar mb-3">
+                    {% for day in history %}
+                        <div class="calendar-day {{ 'goal-met' if day.symbol == '✓' else 'goal-missed' }}">
+                            <div>{{ day.date.strftime('%b %d') }}</div>
+                            <div>{{ day.calories|round }} kcal</div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <div><span class="badge bg-success me-1">✓</span> Goal met</div>
+                    <div><span class="badge bg-danger me-1">✗</span> Below goal</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" id="editForm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Quantity</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="number" name="quantity" step="0.1" min="0.1" class="form-control" id="editQuantity" required>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function editEntry(id, quantity) {
+    const modal = new bootstrap.Modal(document.getElementById('editModal'));
+    document.getElementById('editQuantity').value = quantity;
+    document.getElementById('editForm').action = `/edit-entry/${id}`;
+    modal.show();
+}
+</script>
+
+{% endblock %}

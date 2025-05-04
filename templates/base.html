@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Nutrition App</title>
+</head>
+<body>
+  <nav>
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('search') }}">Search</a> |
+      <a href="{{ url_for('compare') }}">Compare</a> |
+      <a href="{{ url_for('daily') }}">Daily</a> |
+      <a href="{{ url_for('logout') }}">Logout</a>
+    {% else %}
+      <a href="{{ url_for('login') }}">Login</a> |
+      <a href="{{ url_for('signup') }}">Sign Up</a>
+    {% endif %}
+  </nav>
+  <hr>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul>{% for msg in messages %}<li>{{ msg }}</li>{% endfor %}</ul>
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</body>
+</html>
