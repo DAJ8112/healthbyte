@@ -12,6 +12,55 @@ This project was done for the coursework of Applied Database Technologies.
 - Automatic recommendations for remaining calories
 - Visual charts for food comparison
 
+## Functionalities
+
+1. Login Page
+<figure>
+  <img src="screenshots/login.png" alt="Alt text caption" width="500">
+  <!-- <figcaption>Login Page</figcaption> -->
+</figure>
+
+2. Signup Page
+<figure>
+  <img src="screenshots/signup.png" alt="Alt text caption" width="500">
+  <!-- <figcaption>Login Page</figcaption> -->
+</figure>
+
+3. Food Searching
+<figure>
+  <img src="screenshots/search.png" alt="Alt text caption" width="500">
+  <!-- <figcaption>Login Page</figcaption> -->
+</figure>
+
+4. Food Adding
+<figure>
+  <img src="screenshots/foodadd.png" alt="Alt text caption" width="500">
+  <!-- <figcaption>Login Page</figcaption> -->
+</figure>
+
+5. Daily Log
+<figure>
+  <img src="screenshots/dailycomplete.png" alt="Alt text caption" width="500">
+  <!-- <figcaption>Login Page</figcaption> -->
+</figure>
+
+6. Recommendations based on left calories for day
+<figure>
+  <img src="screenshots/recommendations.png" alt="Alt text caption" width="500">
+  <!-- <figcaption>Login Page</figcaption> -->
+</figure>
+
+7. Comparing two food items
+<figure>
+  <img src="screenshots/charts.png" alt="Alt text caption" width="500">
+  <!-- <figcaption>Login Page</figcaption> -->
+</figure>
+
+<figure>
+  <img src="screenshots/chart2.png" alt="Alt text caption" width="500">
+  <!-- <figcaption>Login Page</figcaption> -->
+</figure>
+
 ## Directory Structure
 ```
 /healthbyte
