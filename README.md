@@ -52,7 +52,7 @@ This project was done for the coursework of Applied Database Technologies.
 
 7. Comparing two food items
 <figure>
-  <img src="screenshots/charts.png" alt="Alt text caption" width="500">
+  <img src="screenshots/comparepage.png" alt="Alt text caption" width="500">
   <!-- <figcaption>Login Page</figcaption> -->
 </figure>
 
